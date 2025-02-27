@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="startLoop()">ad</button>
+    <button onclick="playClip('DonLapre.mp3', 57.5, 59)">apt</button>
+    <button onclick="playClip('manyBothansDied.mp3', 0.0, 4.9)">bothansExcel</button>
+
+    <button onclick="startLoop()">Click to play</button>
+
+<script>
+    function startLoop() {
+        let count = 0;
+        const totalCycles = 3; // Number of times to repeat
+        const audio = new Audio('DonLapre.mp3'); // Load the audio file
+
+        function loop() {
+            if (count < totalCycles) {
+                audio.currentTime = 57.5; // Start the audio from 57.5 seconds
+                audio.play();
+
+                // Stop the audio at 60 seconds
+                const duration = (59 - 57.5) * 1000; // Convert to milliseconds
+                setTimeout(() => {
+                    audio.pause();
+                    audio.currentTime = 57.5; // Reset time for next loop
+                    count++;
+                    loop(); // Continue the loop
+                }, duration);
+            }
+        }
+
+        loop(); // Start the loop
+    }
+
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let source;
+            function playClip(url, startTime, endTime) {
+            fetch(url)
+                .then(response => response.arrayBuffer())
+                .then(data => audioContext.decodeAudioData(data))
+                .then(buffer => {
+                    source = audioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.connect(audioContext.destination);
+
+                    // Start at `startTime`, stop at `endTime`
+                        source.start(1, startTime, endTime - startTime);
+                });
+        }
+    </script>
+    </script>
+</body>
+</html>

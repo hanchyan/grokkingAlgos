@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play a Song</title>
+</head>
+<body>
+    <h2>Play Notes</h2>
+    <div id="button-container"></div>
+    <button onclick="playSong()">Play Twinkle Twinkle</button>
+
+    <script>
+
+const audio = new Audio("your-audio-file.mp3");
+audio.play();
+        function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+        // Frequency mapping for musical notes (Octave 4)
+        const notes = {
+            "C": 261.63,
+            "D": 293.66,
+            "E": 329.63,
+            "F": 349.23,
+            "G": 392.00,
+            "A": 440.00,
+            "B": 493.88
+        };
+
+        // Create Audio Context
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playNote(frequency, duration = 500) {
+            const oscillator = audioCtx.createOscillator();
+            oscillator.type = "sine";  // Wave type (sine, square, triangle, etc.)
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            oscillator.connect(audioCtx.destination);
+            oscillator.start();
+            setTimeout(() => oscillator.stop(), duration);
+        }
+
+        // Dynamically create buttons for each note
+        const container = document.getElementById("button-container");
+        Object.entries(notes).forEach(([note, frequency]) => {
+            const button = document.createElement("button");
+            button.innerText = note;
+            button.onclick = () => playNote(frequency);
+            container.appendChild(button);
+        });
+
+        // 🎵 Twinkle Twinkle Little Star
+        const song = [
+            { note: "C", duration: getRandomInt(200, 3000) },
+            { note: "C", duration: getRandomInt(200, 3000) },
+            { note: "G", duration: getRandomInt(200, 3000) },
+            { note: "G", duration: getRandomInt(200, 3000) },
+            { note: "A", duration: getRandomInt(200, 3000) },
+            { note: "A", duration: getRandomInt(200, 3000) },
+            { note: "G", duration: getRandomInt(200, 3000) },
+
+            { note: "F", duration: getRandomInt(200, 3000) },
+            { note: "F", duration: getRandomInt(200, 3000) },
+            { note: "E", duration: getRandomInt(200, 3000) },
+            { note: "E", duration: getRandomInt(200, 3000) },
+            { note: "D", duration: getRandomInt(200, 3000) },
+            { note: "D", duration: getRandomInt(200, 3000) },
+            { note: "C", duration: 1000 }
+        ];
+
+        function playSong() {
+            song.forEach((noteObj, index) => {
+                setTimeout(() => {
+                    playNote(notes[noteObj.note], noteObj.duration);
+                }, index * 600); // Delay each note
+            });
+        }
+    </script>
+</body>
+</html>

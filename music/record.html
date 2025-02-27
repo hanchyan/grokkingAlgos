@@ -1,0 +1,69 @@
+<button class="myButton" onclick="playClip('clip1.mp3', 0, 5, 1, 1)">Play Clip 1</button>
+<button class="myButton" onclick="playClip('clip2.mp3', 2, 7, 1, 1)">Play Clip 2</button>
+<button class="myButton" class="custom-btn" onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 5,1,2)">bothansExcel</button>
+<button class="myButton" class="custom-btn" onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 5,2,1)">bothansExcelFast</button>
+
+<button onclick="startRecording()">🎤 Start Recording</button>
+<button onclick="stopRecording()">⏹ Stop & Save</button>
+
+<script>
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+const gainNode = audioContext.createGain(); // Volume control
+gainNode.connect(audioContext.destination);
+
+let mediaRecorder;
+let audioChunks = [];
+
+async function playClip(audioFile, startTime, endTime, loopCount = 1, speed = 1) {
+    let count = 0;
+
+    function loop() {
+        if (count < loopCount) {
+            fetch(audioFile)
+                .then(response => response.arrayBuffer())
+                .then(data => audioContext.decodeAudioData(data))
+                .then(buffer => {
+                    let source = audioContext.createBufferSource();
+                    source.buffer = buffer;
+                    source.playbackRate.value = speed;
+                    source.connect(gainNode);
+                    source.start(0, startTime, endTime - startTime);
+
+                    setTimeout(() => {
+                        count++;
+                        loop();
+                    }, ((endTime - startTime) / speed) * 1000);
+                });
+        }
+    }
+    loop();
+}
+
+// 🎤 Start recording the mix
+function startRecording() {
+    audioChunks = [];
+    const dest = audioContext.createMediaStreamDestination();
+    gainNode.connect(dest);
+    
+    mediaRecorder = new MediaRecorder(dest.stream);
+    mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+    mediaRecorder.start();
+    
+    console.log("Recording started...");
+}
+
+// ⏹ Stop & Save recording
+function stopRecording() {
+    mediaRecorder.stop();
+    mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const audioURL = URL.createObjectURL(audioBlob);
+        const link = document.createElement("a");
+        link.href = audioURL;
+        link.download = "my_mix.wav";
+        document.body.appendChild(link);
+        link.click();
+        console.log("Recording saved!");
+    };
+}
+</script>

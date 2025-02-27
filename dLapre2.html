@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="startLoop()">Click to play</button>
+
+<script>
+    function startLoop() {
+        let count = 0;
+        const totalCycles = 5; // You can change this to the number of cycles you want
+        const duration = 1500; // Duration of the clip in milliseconds (example: 1500ms = 1.5 seconds)
+
+        function loop() {
+            if (count < totalCycles) {
+                playClip('DonLapre.mp3', 57.5, 59, function() {
+                    count++;
+                    setTimeout(loop, duration); // Wait for the audio to finish before looping
+                });
+            }
+        }
+
+        loop(); // Start the loop
+    }
+
+    function playClip(file, start, end, callback) {
+        console.log('Playing ' + file + ' from ' + start + ' to ' + end);
+
+        // Simulate audio playback with a timeout (replace with actual audio logic)
+        setTimeout(function() {
+            console.log('Finished playing clip');
+            callback(); // Trigger the callback once the clip finishes
+        }, 1500); // Set this to match the duration of the audio clip in milliseconds
+    }
+</script>
+</body>
+</html>

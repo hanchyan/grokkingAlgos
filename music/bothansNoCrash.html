@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Mixer & Recorder</title>
+</head>
+<body>
+
+    <button onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 3, 1, 1)">Play Sound</button>
+    <button class="myButton" class="custom-btn" onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 5,1,2)">bothansExcel</button>
+    <button class="myButton" class="custom-btn" onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 5,2,1)">bothansExcelFast</button>
+    <button class="myButton" class="custom-btn" onclick="playClip('ManyBothansDied.mp3', 0.0, 4.9, 5,.5,1)">bothansExcelSlow</button>
+    <button class="myButton" onclick="playClip('DonLapre.mp3', 57.5, 59, 2,.5,1)">aptSlow</button>
+    <button class="myButton" onclick="playClip('DonLapre.mp3', 57.5, 59, 2,1,1)">aptNormal</button>
+    <button class="myButton" onclick="playClip('DonLapre.mp3', 57.5, 59, 2,2,1)">aptFast</button>
+    <button class="myButton" onclick="playClip('DonLapre.mp3', .9, 3.8, 2,1,1)">incredibleThing</button>
+    <button class="myButton" onclick="playClip('TreasurySecretaryBessentGE.mp3', 262.00, 268.00, 1,2,1)">AnneMarie</button>
+    <button class="myButton" onclick="playClip('TreasurySecretaryBessentGE.mp3', 258.40, 261.50, 2, 1,1)">A Cut?slow</button>
+    <button class="myButton" onclick="playClip('TreasurySecretaryBessentGE.mp3', 258.40, 261.50, 2, 2,1)">A Cut?Fast</button>
+    <button class="myButton" onclick="playClip('WhatIsLove.mp3', 0, 400, 1, 1,.1)">WhatIsLove?</button>
+    <!-- <button onclick="playClip('reverseKissenger.mp3', 0, 30, 1, 1,.1)">haiphong?</button> -->
+    <button onclick="startRecording()">Start Recording</button>
+    <button onclick="stopRecording()">Stop Recording</button>
+
+    <script>
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const recordingDestination = audioContext.createMediaStreamDestination(); // Capture all mixed audio
+        let mediaRecorder;
+        let audioChunks = [];
+
+        async function playClip(audioFile, startTime, endTime, loopCount, speed, volume) {
+            let count = 0;
+            const response = await fetch(audioFile);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+            function loop() {
+                if (count >= loopCount) return;
+
+                const source = audioContext.createBufferSource();
+                const gainNode = audioContext.createGain();
+                gainNode.gain.value = volume;
+
+                source.buffer = audioBuffer;
+                source.playbackRate.value = speed;
+                
+                // Route the audio through the recording destination too
+                source.connect(gainNode);
+                gainNode.connect(audioContext.destination); // Play through speakers
+                gainNode.connect(recordingDestination); // Also send to recording
+
+                const duration = (endTime - startTime) / speed;
+                source.start(0, startTime, duration);
+
+                count++;
+
+                source.onended = () => loop(); // Loop if needed
+            }
+
+            loop();
+        }
+
+        function startRecording() {
+            mediaRecorder = new MediaRecorder(recordingDestination.stream); // Record mixed audio
+            audioChunks = [];
+
+            mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const a = document.createElement("a");
+                a.href = audioUrl;
+                a.download = "mix.wav";
+                a.click();
+            };
+
+            mediaRecorder.start();
+            console.log("Recording started...");
+        }
+
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+                console.log("Recording stopped.");
+            }
+        }
+    </script>
+
+</body>
+</html>
