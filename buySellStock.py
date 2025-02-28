@@ -1,10 +1,11 @@
 class Solution(object):
     def maxProfit(self, prices):
         returns = []
-        for i in prices:
-            for l in prices:
-                p = (i-l)
+        for i in range(len(prices)):
+            for l in prices[i+1:]:
+                p = prices[i]-l
                 returns.append(p)
+                print(returns)
         print(returns)
 
             
