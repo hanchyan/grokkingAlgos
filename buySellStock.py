@@ -1,13 +1,13 @@
 class Solution(object):
     def maxProfit(self, prices):
         returns = []
-        for i in range(len(prices)):
-            x = prices[i]
-            for l in range(len(prices)):
-                profit = x - prices[l] 
-                returns.append[profit]
-                print(returns)
-            # print(x)
+        for i in prices:
+            for l in prices:
+                p = (i-l)
+                returns.append(p)
+        print(returns)
+
+            
 
 solution = Solution()
 result = solution.maxProfit([7,1,5,3,6,4])
