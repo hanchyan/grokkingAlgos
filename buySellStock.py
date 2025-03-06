@@ -5,8 +5,10 @@ class Solution(object):
             for l in prices[i+1:]:
                 p = prices[i]-l
                 returns.append(p)
-                print(returns)
-        print(returns)
+        for i in returns:
+            if returns[i] > returns[i +1]:
+                returns.pop(i)
+            print(returns)
 
             
 
